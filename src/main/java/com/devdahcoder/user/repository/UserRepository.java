@@ -4,11 +4,11 @@ import com.devdahcoder.user.contract.UserServiceInterface;
 import com.devdahcoder.user.model.UserMapperModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-@Service
+@Repository
 public class UserRepository implements UserServiceInterface {
 
     @Autowired
