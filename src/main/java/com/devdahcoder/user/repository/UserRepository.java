@@ -2,6 +2,8 @@ package com.devdahcoder.user.repository;
 
 import com.devdahcoder.exception.database.DatabaseBadGrammarException;
 import com.devdahcoder.exception.database.DatabaseDataAccessException;
+import com.devdahcoder.exception.database.DatabaseDataAccessResourceFailureException;
+import com.devdahcoder.exception.database.DatabaseDataIntegrityException;
 import com.devdahcoder.user.contract.UserServiceInterface;
 import com.devdahcoder.user.model.CreateUserModel;
 import com.devdahcoder.user.model.UserDetailModel;
@@ -11,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -91,16 +95,55 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
 
     }
 
+    /**
+     * Creates a user in the database.
+     *
+     * @param user The user to create.
+     * @return A status message indicating success or failure.
+     * @throws DatabaseBadGrammarException If a SQL grammar error occurs.
+     * @throws DatabaseDataIntegrityException If a data integrity violation occurs.
+     * @throws DatabaseDataAccessException If a data access error occurs.
+     */
     @Override
     public String createUser(@NotNull CreateUserModel user) {
 
-        var updated = jdbcClient
-                .sql("INSERT INTO todo.user(userId, firstName, lastName, email, username, password, role) " +
-                        "values(?, ?, ?, ?, ?, ?, ?)")
-                .param(List.of(user.getUserId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword(), user.getRole()))
-                .update();
+        String sqlQuery = "INSERT INTO todo.user(userId, firstName, lastName, email, username, password, role) " +
+                "values(?, ?, ?, ?, ?, ?, ?)";
 
-        return updated == 1 ? "Updated " + user.getUsername() : "Could not update";
+        try {
+
+            var created = jdbcClient
+                    .sql(sqlQuery)
+                    .param(List.of(user.getUserId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword(), user.getRole()))
+                    .update();
+
+            return created == 1 ? "Created user: " + user.getUsername() : "Could not create user: " + user.getUsername();
+
+        } catch (BadSqlGrammarException exception) {
+
+            logger.error("Your sql query contains syntax errors: {}", exception.getSql());
+
+            throw new DatabaseBadGrammarException("DB-001", "SQL query syntax error: " + exception.getSql(), exception.getSQLException());
+
+        } catch (DataIntegrityViolationException exception) {
+
+            logger.error("Data integrity violation while creating user: {}", exception.getMessage());
+
+            throw new DatabaseDataIntegrityException("Could not create user", exception);
+
+        } catch (DataAccessResourceFailureException exception) {
+
+            logger.error("No connection could be made to a database: {}", exception.getMessage());
+
+            throw new DatabaseDataAccessResourceFailureException("Connection could not be made to a database", exception);
+
+        } catch (DataAccessException exception) {
+
+            logger.error("Something went wrong with sql query: {}", exception.getMessage());
+
+            throw new DatabaseDataAccessException("Something went wrong while retrieving data from the database", exception);
+
+        }
 
     }
 

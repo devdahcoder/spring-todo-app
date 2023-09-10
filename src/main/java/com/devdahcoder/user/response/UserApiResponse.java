@@ -1,148 +1,148 @@
 package com.devdahcoder.user.response;
 
-import com.devdahcoder.user.contract.GenderEnum;
-import com.devdahcoder.user.contract.RoleEnum;
+import java.util.List;
 
-import java.util.Objects;
-import java.util.UUID;
+/**
+ * Represents a generic API response for paginated data.
+ *
+ * @param <T> The type of data being returned in the response.
+ */
+public class UserApiResponse<T> {
 
-public class UserApiResponse {
+    /**
+     * The current page number.
+     */
+    private int page = 0;
 
-    private int id;
-    private UUID userId;
-    private String email;
-    private String lastName;
-    private String username;
-    private String firstName;
-    private GenderEnum gender;
-    private RoleEnum userType;
+    /**
+     * The list of data items for the current page.
+     */
+    private List<T> data;
 
-    public UserApiResponse() { }
+    /**
+     * The maximum number of data items per page.
+     */
+    private int limit = 0;
 
-    public UserApiResponse(int id, UUID userId, String firstName, String lastName, String username, String email, GenderEnum gender, RoleEnum userType) {
+    /**
+     * The offset of the data items for the current page.
+     */
+    private int offSet = 0;
 
-        this.id = id;
-        this.email = email;
-        this.userId = userId;
-        this.gender = gender;
-        this.lastName = lastName;
-        this.username = username;
-        this.userType = userType;
-        this.firstName = firstName;
+    /**
+     * The total number of data items across all pages.
+     */
+    private int totalData = 0;
 
-    }
+    /**
+     * The total number of pages in the paginated data.
+     */
+    private int totalPage = 0;
 
-    public int getId() {
+    /**
+     * The order in which data is sorted (e.g., ASC or DESC).
+     */
+    private String order = "ASC";
 
-        return id;
+    /**
+     * Indicates whether there is a next page of data.
+     */
+    private boolean hasNext = false;
 
-    }
+    /**
+     * The current total number of data items on the current page.
+     */
+    private int currentTotalData = 0;
 
-    public void setId(int id) {
+    /**
+     * A message describing the data content (e.g., "All data").
+     */
+    private String message = "All data";
 
-        this.id = id;
+    /**
+     * Indicates whether there is a previous page of data.
+     */
+    private boolean hasPrevious = false;
 
-    }
+    public UserApiResponse(int page, List<T> data, int limit, int offSet, int totalData, int totalPage, String order, boolean hasNext, int currentTotalData, String message, boolean hasPrevious) {
 
-    public UUID getUserId() {
-
-        return userId;
-
-    }
-
-    public void setUserId(UUID userId) {
-
-        this.userId = userId;
-
-    }
-
-    public String getEmail() {
-
-        return email;
-
-    }
-
-    public void setEmail(String email) {
-
-        this.email = email;
-
-    }
-
-    public String getLastName() {
-
-        return lastName;
-
-    }
-
-    public void setLastName(String lastName) {
-
-        this.lastName = lastName;
-
-    }
-
-    public String getUsername() {
-
-        return username;
+        this.page = page;
+        this.data = data;
+        this.limit = limit;
+        this.offSet = offSet;
+        this.totalData = totalData;
+        this.totalPage = totalPage;
+        this.order = order;
+        this.hasNext = hasNext;
+        this.currentTotalData = currentTotalData;
+        this.message = message;
+        this.hasPrevious = hasPrevious;
 
     }
 
-    public void setUsername(String username) {
+    public int getPage() {
 
-        this.username = username;
-
-    }
-
-    public String getFirstName() {
-
-        return firstName;
+        return page;
 
     }
 
-    public void setFirstName(String firstName) {
+    public List<T> getData() {
 
-        this.firstName = firstName;
-
-    }
-
-    public GenderEnum getGender() {
-
-        return gender;
+        return data;
 
     }
 
-    public void setGender(GenderEnum gender) {
+    public int getLimit() {
 
-        this.gender = gender;
-
-    }
-
-    public RoleEnum getUserType() {
-
-        return userType;
+        return limit;
 
     }
 
-    public void setUserType(RoleEnum userType) {
+    public int getOffSet() {
 
-        this.userType = userType;
-
-    }
-
-    @Override
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-
-        if (!(o instanceof UserApiResponse that)) return false;
-
-        return getId() == that.getId() && Objects.equals(getUserId(), that.getUserId()) && Objects.equals(getEmail(), that.getEmail()) && Objects.equals(getLastName(), that.getLastName()) && Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getFirstName(), that.getFirstName()) && getGender() == that.getGender() && getUserType() == that.getUserType();
+        return offSet;
 
     }
 
-    @Override
-    public int hashCode() {
+    public int getTotalData() {
 
-        return Objects.hash(getId(), getUserId(), getEmail(), getLastName(), getUsername(), getFirstName(), getGender(), getUserType());
+        return totalData;
+
+    }
+
+    public int getTotalPage() {
+
+        return totalPage;
+
+    }
+
+    public String getOrder() {
+
+        return order;
+
+    }
+
+    public boolean isHasNext() {
+
+        return hasNext;
+
+    }
+
+    public int getCurrentTotalData() {
+
+        return currentTotalData;
+
+    }
+
+    public String getMessage() {
+
+        return message;
+
+    }
+
+    public boolean isHasPrevious() {
+
+        return hasPrevious;
 
     }
 

@@ -39,7 +39,7 @@ public class UserService implements UserServiceInterface {
     @Override
     public String createUser(@NotNull CreateUserModel user) {
 
-        logger.info("Service: creating user => {}", user.getUsername());
+        logger.info("Service: creating user: {}", user.getUsername());
 
         user.setRole(RoleEnum.USER);
         user.setUserId(UUID.randomUUID());
@@ -55,7 +55,7 @@ public class UserService implements UserServiceInterface {
 
         }
 
-        // Saves user to the database if user does not exist
+        //** Saves user to the database if user does not exist */
         return userRepository.createUser(user);
 
     }

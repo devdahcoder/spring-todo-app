@@ -20,7 +20,12 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("")
-    public ResponseEntity<Iterable<UserMapperModel>> findAllUsers() {
+    public ResponseEntity<Iterable<UserMapperModel>> findAllUsers(
+            @RequestParam( defaultValue = "10", required = false, name = "limit", value = "limit" ) int limit,
+            @RequestParam( defaultValue = "0", required = false, name = "offset", value = "offset" ) int offset,
+            @RequestParam( defaultValue = "ASC", required = false, name = "order", value = "order" ) String order,
+            @RequestParam( defaultValue = "1", required = false, name = "page", value = "page" ) int page
+    ) {
 
         return new ResponseEntity<>(userService.findAllUsers(), HttpStatus.OK);
 
