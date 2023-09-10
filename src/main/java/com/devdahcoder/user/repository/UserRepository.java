@@ -3,12 +3,13 @@ package com.devdahcoder.user.repository;
 import com.devdahcoder.exception.database.DatabaseBadGrammarException;
 import com.devdahcoder.exception.database.DatabaseDataAccessException;
 import com.devdahcoder.user.contract.UserServiceInterface;
+import com.devdahcoder.user.model.CreateUserModel;
 import com.devdahcoder.user.model.UserDetailModel;
 import com.devdahcoder.user.model.UserMapperModel;
 import com.devdahcoder.user.model.UserModel;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -25,7 +27,6 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
 
     private final Logger logger = LoggerFactory.getLogger(UserRepository.class);
 
-    @Autowired
     private final JdbcClient jdbcClient;
 
     public UserRepository(JdbcClient jdbcClient) { this.jdbcClient = jdbcClient; }
@@ -87,6 +88,31 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
             throw new DatabaseDataAccessException("Something went wrong while retrieving data from the database", exception);
 
         }
+
+    }
+
+    @Override
+    public String createUser(@NotNull CreateUserModel user) {
+
+        var updated = jdbcClient
+                .sql("INSERT INTO todo.user(userId, firstName, lastName, email, username, password, role) " +
+                        "values(?, ?, ?, ?, ?, ?, ?)")
+                .param(List.of(user.getUserId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword(), user.getRole()))
+                .update();
+
+        return updated == 1 ? "Updated " + user.getUsername() : "Could not update";
+
+    }
+
+    @Override
+    public boolean userExists(String username) {
+
+        return jdbcClient
+                .sql("SELECT * FROM todo.user WHERE username = :username")
+                .param("username", username)
+                .query(UserModel.class)
+                .optional()
+                .isPresent();
 
     }
 

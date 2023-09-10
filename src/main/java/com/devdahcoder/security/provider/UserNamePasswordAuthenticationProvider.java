@@ -28,7 +28,6 @@ public class UserNamePasswordAuthenticationProvider implements AuthenticationPro
 
     }
 
-
     @Override
     public Authentication authenticate(@NotNull Authentication authentication) throws AuthenticationException {
 
@@ -56,7 +55,7 @@ public class UserNamePasswordAuthenticationProvider implements AuthenticationPro
 
     }
 
-    public boolean verifyUsername(UserDetailModel user, String username) {
+    public boolean verifyUsername(@NotNull UserDetailModel user, @NotNull String username) {
 
         return username.equals(user.getUsername());
 
