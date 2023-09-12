@@ -1,5 +1,6 @@
 package com.devdahcoder.user.response;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  *
  * @param <T> The type of data being returned in the response.
  */
-public class UserApiResponse<T> {
+public class UserIteratableApiResponse<T> {
 
     /**
      * The current page number.
@@ -17,7 +18,7 @@ public class UserApiResponse<T> {
     /**
      * The list of data items for the current page.
      */
-    private List<T> data;
+    private Iterable<T> data;
 
     /**
      * The maximum number of data items per page.
@@ -64,7 +65,7 @@ public class UserApiResponse<T> {
      */
     private boolean hasPrevious = false;
 
-    public UserApiResponse(int page, List<T> data, int limit, int offSet, int totalData, int totalPage, String order, boolean hasNext, int currentTotalData, String message, boolean hasPrevious) {
+    public UserIteratableApiResponse(int page, Iterable<T> data, int limit, int offSet, int totalData, int totalPage, String order, boolean hasNext, int currentTotalData, String message, boolean hasPrevious) {
 
         this.page = page;
         this.data = data;
@@ -86,7 +87,7 @@ public class UserApiResponse<T> {
 
     }
 
-    public List<T> getData() {
+    public Iterable<T> getData() {
 
         return data;
 

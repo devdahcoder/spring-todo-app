@@ -30,9 +30,9 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public Iterable<UserMapperModel> findAllUsers() {
+    public Iterable<UserMapperModel> findAllUsers(String order, int limit) {
 
-        return userRepository.findAllUsers();
+        return userRepository.findAllUsers(order, limit);
 
     }
 
@@ -66,5 +66,13 @@ public class UserService implements UserServiceInterface {
         return userRepository.userExists(username);
 
     }
+
+    @Override
+    public int countUser() {
+
+        return userRepository.countUser();
+
+    }
+
 
 }

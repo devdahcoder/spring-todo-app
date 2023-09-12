@@ -68,14 +68,16 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
     }
 
     @Override
-    public Iterable<UserMapperModel> findAllUsers() {
+    public Iterable<UserMapperModel> findAllUsers(String order, int limit) {
 
-        String sqlQuery = "SELECT * FROM todo.user";
+        String sqlQuery = "SELECT * FROM todo.user ORDER BY ? LIMIT ?";
 
         try {
 
             return jdbcClient
                     .sql(sqlQuery)
+                    .param(order)
+                    .param(limit)
                     .query(UserMapperModel.class)
                     .list();
 
@@ -156,6 +158,15 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
                 .query(UserModel.class)
                 .optional()
                 .isPresent();
+
+    }
+
+    @Override
+    public int countUser() {
+
+        Optional<Integer> countOptional = jdbcClient.sql("SELECT count(*) FROM todo.user").query(Integer.class).optional();
+
+        return countOptional.orElse(0);
 
     }
 
