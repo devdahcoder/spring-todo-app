@@ -1,6 +1,7 @@
 package com.devdahcoder.user.service;
 
 import com.devdahcoder.exception.api.ApiAlreadyExistException;
+import com.devdahcoder.exception.api.ApiNotFoundException;
 import com.devdahcoder.user.contract.RoleEnum;
 import com.devdahcoder.user.contract.UserServiceInterface;
 import com.devdahcoder.user.model.CreateUserModel;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,9 +32,9 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public Iterable<UserMapperModel> findAllUsers(String order, int limit) {
+    public Iterable<UserMapperModel> findAllUsers(String order, int limit, int offset) {
 
-        return userRepository.findAllUsers(order, limit);
+        return userRepository.findAllUsers(order, limit, offset);
 
     }
 
@@ -59,6 +61,14 @@ public class UserService implements UserServiceInterface {
         return userRepository.createUser(user);
 
     }
+
+    @Override
+    public Optional<UserMapperModel> getUserById(UUID userId) {
+
+        return userRepository.getUserById(userId);
+
+    }
+
 
     @Override
     public boolean userExists(String username) {

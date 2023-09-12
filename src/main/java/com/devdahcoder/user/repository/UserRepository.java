@@ -1,5 +1,6 @@
 package com.devdahcoder.user.repository;
 
+import com.devdahcoder.exception.api.ApiNotFoundException;
 import com.devdahcoder.exception.database.DatabaseBadGrammarException;
 import com.devdahcoder.exception.database.DatabaseDataAccessException;
 import com.devdahcoder.exception.database.DatabaseDataAccessResourceFailureException;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Transactional
 @Repository
@@ -68,9 +70,9 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
     }
 
     @Override
-    public Iterable<UserMapperModel> findAllUsers(String order, int limit) {
+    public Iterable<UserMapperModel> findAllUsers(String order, int limit, int offset) {
 
-        String sqlQuery = "SELECT * FROM todo.user ORDER BY ? LIMIT ?";
+        String sqlQuery = "SELECT * FROM todo.user ORDER BY ? LIMIT ? OFFSET ?";
 
         try {
 
@@ -78,12 +80,13 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
                     .sql(sqlQuery)
                     .param(order)
                     .param(limit)
+                    .param(offset)
                     .query(UserMapperModel.class)
                     .list();
 
         } catch (BadSqlGrammarException exception) {
 
-            logger.error("Your sql query contains grammatical errors: {}", exception.getSql());
+            logger.error("Your sql query contains syntax errors: {}", exception.getSql());
 
             throw new DatabaseBadGrammarException("findAllUser: ", sqlQuery, exception.getSQLException());
 
@@ -109,14 +112,13 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
     @Override
     public String createUser(@NotNull CreateUserModel user) {
 
-        String sqlQuery = "INSERT INTO todo.user(userId, firstName, lastName, email, username, password, role) " +
-                "values(?, ?, ?, ?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO todo.user(userId, firstName, lastName, email, username, password, gender, role) values(?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
 
             var created = jdbcClient
                     .sql(sqlQuery)
-                    .param(List.of(user.getUserId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword(), user.getRole()))
+                    .params(List.of(user.getUserId().toString(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword(), "MALE", user.getRole().toString()))
                     .update();
 
             return created == 1 ? "Created user: " + user.getUsername() : "Could not create user: " + user.getUsername();
@@ -138,6 +140,28 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
             logger.error("No connection could be made to a database: {}", exception.getMessage());
 
             throw new DatabaseDataAccessResourceFailureException("Connection could not be made to a database", exception);
+
+        } catch (DataAccessException exception) {
+
+            logger.error("Something went wrong with sql query: {}", exception.getMessage());
+
+            throw new DatabaseDataAccessException("Something went wrong while retrieving data from the database", exception);
+
+        }
+
+    }
+
+    @Override
+    public Optional<UserMapperModel> getUserById(@NotNull UUID userId) {
+
+        try {
+
+            var userFound = jdbcClient.sql("SELECT * FROM todo.user WHERE userId = :userId")
+                    .param("userId", userId.toString())
+                    .query(UserMapperModel.class)
+                    .optional();
+
+            return Optional.ofNullable(userFound.orElseThrow(() -> new ApiNotFoundException("User with userId " + userId + " could not be found")));
 
         } catch (DataAccessException exception) {
 

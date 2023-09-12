@@ -1,6 +1,7 @@
 package com.devdahcoder.exception.api.handler;
 
 import com.devdahcoder.exception.api.ApiAlreadyExistException;
+import com.devdahcoder.exception.api.ApiNotFoundException;
 import com.devdahcoder.exception.model.ApiExceptionModel;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +21,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    @Autowired
     private HttpServletRequest httpServletRequest;
 
     public ApiExceptionHandler(HttpServletRequest httpServletRequest) {
@@ -57,6 +57,22 @@ public class ApiExceptionHandler {
         );
 
         return new ResponseEntity<>(apiExceptionModel, HttpStatus.CONFLICT);
+
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ApiNotFoundException.class)
+    public ResponseEntity<ApiExceptionModel> getNotFoundHandler(@NotNull ApiNotFoundException apiNotFoundException) {
+
+        ApiExceptionModel apiExceptionModel = new ApiExceptionModel(
+                HttpStatus.CONFLICT.value(),
+                apiNotFoundException.getMessage(),
+                apiNotFoundException.getCause(),
+                HttpStatus.CONFLICT,
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+
+        return new ResponseEntity<>(apiExceptionModel, HttpStatus.NOT_FOUND);
 
     }
 
