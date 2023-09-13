@@ -70,7 +70,7 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
     }
 
     @Override
-    public Iterable<UserMapperModel> findAllUsers(String order, int limit, int offset) {
+    public List<UserMapperModel> findAllUsers(String order, int limit, int offset) {
 
         String sqlQuery = "SELECT * FROM todo.user ORDER BY ? LIMIT ? OFFSET ?";
 

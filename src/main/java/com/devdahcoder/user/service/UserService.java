@@ -1,18 +1,22 @@
 package com.devdahcoder.user.service;
 
 import com.devdahcoder.exception.api.ApiAlreadyExistException;
-import com.devdahcoder.exception.api.ApiNotFoundException;
 import com.devdahcoder.user.contract.RoleEnum;
 import com.devdahcoder.user.contract.UserServiceInterface;
+import com.devdahcoder.user.model.AuthenticateUserModel;
 import com.devdahcoder.user.model.CreateUserModel;
 import com.devdahcoder.user.model.UserMapperModel;
 import com.devdahcoder.user.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,16 +27,18 @@ public class UserService implements UserServiceInterface {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
 
     }
 
     @Override
-    public Iterable<UserMapperModel> findAllUsers(String order, int limit, int offset) {
+    public List<UserMapperModel> findAllUsers(String order, int limit, int offset) {
 
         return userRepository.findAllUsers(order, limit, offset);
 
@@ -63,6 +69,18 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
+    public String authenticateUser(@NotNull AuthenticateUserModel authenticateUserModel) {
+
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticateUserModel.getUsername(), authenticateUserModel.getPassword());
+
+        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
+        return null;
+
+    }
+
+
+    @Override
     public Optional<UserMapperModel> getUserById(UUID userId) {
 
         return userRepository.getUserById(userId);
@@ -83,6 +101,5 @@ public class UserService implements UserServiceInterface {
         return userRepository.countUser();
 
     }
-
 
 }
