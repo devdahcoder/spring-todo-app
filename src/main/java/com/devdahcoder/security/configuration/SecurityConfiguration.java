@@ -1,5 +1,6 @@
 package com.devdahcoder.security.configuration;
 
+import com.devdahcoder.security.filter.JwtAuthenticationFilter;
 import com.devdahcoder.security.provider.UserNamePasswordAuthenticationProvider;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +15,20 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
     private final UserNamePasswordAuthenticationProvider userNamePasswordAuthenticationProvider;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfiguration(UserNamePasswordAuthenticationProvider userNamePasswordAuthenticationProvider) {
+    public SecurityConfiguration(UserNamePasswordAuthenticationProvider userNamePasswordAuthenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter) {
 
         this.userNamePasswordAuthenticationProvider = userNamePasswordAuthenticationProvider;
+
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 
     }
 
@@ -49,15 +54,16 @@ public class SecurityConfiguration {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("api/v1/users/**")
-                                .authenticated()
-                                .anyRequest()
+                                .requestMatchers("api/v1/users/login")
                                 .permitAll()
+                                .anyRequest()
+                                .authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
 
     }

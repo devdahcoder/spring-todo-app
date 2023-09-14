@@ -6,10 +6,7 @@ import com.devdahcoder.exception.database.DatabaseDataAccessException;
 import com.devdahcoder.exception.database.DatabaseDataAccessResourceFailureException;
 import com.devdahcoder.exception.database.DatabaseDataIntegrityException;
 import com.devdahcoder.user.contract.UserServiceInterface;
-import com.devdahcoder.user.model.CreateUserModel;
-import com.devdahcoder.user.model.UserDetailModel;
-import com.devdahcoder.user.model.UserMapperModel;
-import com.devdahcoder.user.model.UserModel;
+import com.devdahcoder.user.model.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,6 +145,13 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
             throw new DatabaseDataAccessException("Something went wrong while retrieving data from the database", exception);
 
         }
+
+    }
+
+    @Override
+    public String authenticateUser(AuthenticateUserModel authenticateUserModel) {
+
+        return null;
 
     }
 

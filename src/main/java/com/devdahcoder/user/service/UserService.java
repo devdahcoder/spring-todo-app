@@ -1,6 +1,7 @@
 package com.devdahcoder.user.service;
 
 import com.devdahcoder.exception.api.ApiAlreadyExistException;
+import com.devdahcoder.security.jwt.JwtService;
 import com.devdahcoder.user.contract.RoleEnum;
 import com.devdahcoder.user.contract.UserServiceInterface;
 import com.devdahcoder.user.model.AuthenticateUserModel;
@@ -28,12 +29,14 @@ public class UserService implements UserServiceInterface {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
 
     }
 
@@ -75,10 +78,9 @@ public class UserService implements UserServiceInterface {
 
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
-        return null;
+        return jwtService.generateJwtToken(authentication.getName());
 
     }
-
 
     @Override
     public Optional<UserMapperModel> getUserById(UUID userId) {
@@ -86,7 +88,6 @@ public class UserService implements UserServiceInterface {
         return userRepository.getUserById(userId);
 
     }
-
 
     @Override
     public boolean userExists(String username) {

@@ -54,9 +54,9 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping("/login")
-    public String authenticateUser(@RequestBody @Valid AuthenticateUserModel authenticateUserModel) {
+    public ResponseEntity<String> authenticateUser(@RequestBody @Valid AuthenticateUserModel authenticateUserModel) {
 
-        return "Hello World";
+        return new ResponseEntity<>(userService.authenticateUser(authenticateUserModel), HttpStatus.ACCEPTED);
 
     }
 
