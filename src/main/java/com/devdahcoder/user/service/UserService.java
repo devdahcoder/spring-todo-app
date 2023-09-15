@@ -25,7 +25,6 @@ import java.util.UUID;
 public class UserService implements UserServiceInterface {
 
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -48,7 +47,7 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public String createUser(@NotNull CreateUserModel user) {
+    public CreateUserModel createUser(@NotNull CreateUserModel user) {
 
         logger.info("Service: creating user: {}", user.getUsername());
 

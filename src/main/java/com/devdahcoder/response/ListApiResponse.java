@@ -1,4 +1,4 @@
-package com.devdahcoder.user.response;
+package com.devdahcoder.response;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @param <T> The type of data being returned in the response.
  */
-public class UserIterableApiResponse<T> {
+public class ListApiResponse<T> {
 
     /**
      * The current page number.
@@ -64,7 +64,7 @@ public class UserIterableApiResponse<T> {
      */
     private boolean hasPrevious = false;
 
-    public UserIterableApiResponse(int page, List<T> data, int limit, int offSet, int totalData, int totalPage, String order, boolean hasNext, int currentTotalData, String message, boolean hasPrevious) {
+    public ListApiResponse(int page, List<T> data, int limit, int offSet, int totalData, int totalPage, String order, boolean hasNext, int currentTotalData, String message, boolean hasPrevious) {
 
         this.page = page;
         this.data = data;

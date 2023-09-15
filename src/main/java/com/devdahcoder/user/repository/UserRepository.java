@@ -101,24 +101,28 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
      * Creates a user in the database.
      *
      * @param user The user to create.
+     *
      * @return A status message indicating success or failure.
-     * @throws DatabaseBadGrammarException If a SQL grammar error occurs.
+     *
+     * @throws DatabaseBadGrammarException    If a SQL grammar error occurs.
      * @throws DatabaseDataIntegrityException If a data integrity violation occurs.
-     * @throws DatabaseDataAccessException If a data access error occurs.
+     * @throws DatabaseDataAccessException    If a data access error occurs.
      */
     @Override
-    public String createUser(@NotNull CreateUserModel user) {
+    public CreateUserModel createUser(@NotNull CreateUserModel user) {
 
         String sqlQuery = "INSERT INTO todo.user(userId, firstName, lastName, email, username, password, gender, role) values(?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
 
-            var created = jdbcClient
+            jdbcClient
                     .sql(sqlQuery)
                     .params(List.of(user.getUserId().toString(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword(), "MALE", user.getRole().toString()))
                     .update();
 
-            return created == 1 ? "Created user: " + user.getUsername() : "Could not create user: " + user.getUsername();
+            return user;
+
+//            return created == 1 ? "Created user: " + user.getUsername() : "Could not create user: " + user.getUsername();
 
         } catch (BadSqlGrammarException exception) {
 

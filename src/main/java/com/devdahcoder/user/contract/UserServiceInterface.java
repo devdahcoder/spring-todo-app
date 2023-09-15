@@ -12,7 +12,7 @@ public interface UserServiceInterface {
 
     public List<UserMapperModel> findAllUsers(String order, int limit, int offset);
 
-    public String createUser(CreateUserModel user);
+    public CreateUserModel createUser(CreateUserModel user);
 
     public String authenticateUser(AuthenticateUserModel authenticateUserModel);
 
