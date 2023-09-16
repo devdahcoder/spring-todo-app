@@ -3,7 +3,6 @@ package com.devdahcoder.security.provider;
 import com.devdahcoder.user.model.UserDetailModel;
 import com.devdahcoder.user.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,10 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserNamePasswordAuthenticationProvider implements AuthenticationProvider {
 
-    @Autowired
     private final UserRepository userRepository;
 
-    @Autowired
     private final PasswordEncoder passwordEncoder;
 
     public UserNamePasswordAuthenticationProvider(UserRepository userRepository, PasswordEncoder passwordEncoder) {

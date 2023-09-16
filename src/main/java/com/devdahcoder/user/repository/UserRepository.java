@@ -117,7 +117,7 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
 
             jdbcClient
                     .sql(sqlQuery)
-                    .params(List.of(user.getUserId().toString(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword(), "MALE", user.getRole().toString()))
+                    .params(List.of(user.getUserId().toString(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword(), user.getGender().toString(), user.getRole().toString()))
                     .update();
 
             return user;

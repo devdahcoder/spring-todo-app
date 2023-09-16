@@ -35,10 +35,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("")
     public ResponseEntity<ListApiResponse<UserMapperModel>> findAllUsers(
-            @RequestParam(defaultValue = "10", required = false, name = "limit", value = "10") int limit,
-            @RequestParam(defaultValue = "0", required = false, name = "offset", value = "0") int offset,
-            @RequestParam(defaultValue = "ASC", required = false, name = "order", value = "ASC") String order,
-            @RequestParam(defaultValue = "1", required = false, name = "page", value = "1") int page
+            @RequestParam(defaultValue = "10", required = false, name = "limit") int limit,
+            @RequestParam(defaultValue = "0", required = false, name = "offset") int offset,
+            @RequestParam(defaultValue = "ASC", required = false, name = "order") String order,
+            @RequestParam(defaultValue = "1", required = false, name = "page") int page
     ) {
 
         List<UserMapperModel> allUsers = userService.findAllUsers(order, limit, ApiUtil.calculateOffSet(limit, page));

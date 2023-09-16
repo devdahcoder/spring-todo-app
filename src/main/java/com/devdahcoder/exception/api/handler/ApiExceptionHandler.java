@@ -2,12 +2,14 @@ package com.devdahcoder.exception.api.handler;
 
 import com.devdahcoder.exception.api.ApiAlreadyExistException;
 import com.devdahcoder.exception.api.ApiNotFoundException;
+import com.devdahcoder.exception.model.ApiBadRequestExceptionModel;
+import com.devdahcoder.exception.model.ApiBadRequestFieldModel;
 import com.devdahcoder.exception.model.ApiExceptionModel;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -31,16 +34,21 @@ public class ApiExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> getRequestHandler(@NotNull MethodArgumentNotValidException methodArgumentNotValidException) {
+    public ResponseEntity<ApiBadRequestExceptionModel<ApiBadRequestFieldModel>> getRequestHandler(@NotNull MethodArgumentNotValidException methodArgumentNotValidException) {
 
-        Map<String, String> requestErrors = new HashMap<>();
+        ApiBadRequestExceptionModel<ApiBadRequestFieldModel> apiBadRequestExceptionModel = new ApiBadRequestExceptionModel<>(
+                HttpStatus.BAD_REQUEST,
+                "Invalid input",
+                HttpStatus.BAD_REQUEST.value(),
+                methodArgumentNotValidException
+                        .getBindingResult()
+                        .getFieldErrors()
+                        .stream()
+                        .map(requestError -> new ApiBadRequestFieldModel(requestError.getField(), requestError.getDefaultMessage()))
+                        .toList()
+        );
 
-        methodArgumentNotValidException
-                .getBindingResult()
-                .getFieldErrors()
-                .forEach(requestError -> requestErrors.put(requestError.getField(), requestError.getDefaultMessage()));
-
-        return requestErrors;
+        return new ResponseEntity<>(apiBadRequestExceptionModel, HttpStatus.BAD_REQUEST);
 
     }
 
