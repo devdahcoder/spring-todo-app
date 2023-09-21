@@ -1,6 +1,7 @@
 package com.devdahcoder.user.service;
 
 import com.devdahcoder.exception.api.ApiAlreadyExistException;
+import com.devdahcoder.exception.api.ApiBadCredentialException;
 import com.devdahcoder.security.jwt.JwtService;
 import com.devdahcoder.user.contract.RoleEnum;
 import com.devdahcoder.user.contract.UserServiceInterface;
@@ -12,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -73,11 +75,19 @@ public class UserService implements UserServiceInterface {
     @Override
     public String authenticateUser(@NotNull AuthenticateUserModel authenticateUserModel) {
 
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticateUserModel.getUsername(), authenticateUserModel.getPassword());
+        try {
 
-        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticateUserModel.getUsername(), authenticateUserModel.getPassword());
 
-        return jwtService.generateJwtToken(authentication.getName());
+            Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
+            return jwtService.generateJwtToken(authentication.getName());
+
+        } catch (BadCredentialsException exception) {
+
+            throw new ApiBadCredentialException("Invalid username or password", exception);
+
+        }
 
     }
 

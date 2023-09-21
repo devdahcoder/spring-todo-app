@@ -2,6 +2,7 @@ package com.devdahcoder.security.filter;
 
 import com.devdahcoder.security.jwt.JwtService;
 import com.devdahcoder.user.repository.UserRepository;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,8 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
+    private static  final String HEADER_PREFIX = "Bearer ";
+    private static final String REQUEST_HEADER = "Authorization";
     private final JwtService jwtService;
 
     public JwtAuthenticationFilter(UserRepository userRepository, JwtService jwtService) {
@@ -32,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
 
-        final String authenticationHeader = request.getHeader("Authorization");
+        final String authenticationHeader = request.getHeader(REQUEST_HEADER);
 
         if (this.validateHeader(authenticationHeader)) {
 
@@ -42,21 +45,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         }
 
-        String jwtToken = this.extractJwtToken(authenticationHeader);
+        try {
 
-        String username = jwtService.extractUsername(jwtToken);
+            String jwtToken = this.extractJwtToken(authenticationHeader);
 
-        if (this.isUserFound(username)) {
+            String username = jwtService.extractUsername(jwtToken);
 
-            UserDetails userDetails = userRepository.loadUserByUsername(username);
+            if (this.isUserFound(username)) {
 
-            if (jwtService.isTokenValid(jwtToken, userDetails)) {
+                UserDetails userDetails = userRepository.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = this.createAuthentication(userDetails, request);
+                if (jwtService.isTokenValid(jwtToken, userDetails)) {
 
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = this.createAuthentication(userDetails, request);
+
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+                }
 
             }
+
+        } catch (Exception ex) {
+
+            throw new JwtException("Something went wrong", ex);
 
         }
 
@@ -88,7 +99,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public boolean validateHeader(String authenticationHeader) {
 
-        return authenticationHeader == null || !authenticationHeader.startsWith("Bearer ");
+        return authenticationHeader == null || !authenticationHeader.startsWith(HEADER_PREFIX);
 
     }
 

@@ -1,10 +1,11 @@
 package com.devdahcoder.user.controller;
 
-import com.devdahcoder.response.CreateApiResponse;
+import com.devdahcoder.response.success.CreateApiResponseSuccess;
+import com.devdahcoder.response.success.JwtTokenApiResponseSuccess;
 import com.devdahcoder.user.model.AuthenticateUserModel;
 import com.devdahcoder.user.model.CreateUserModel;
 import com.devdahcoder.user.model.UserMapperModel;
-import com.devdahcoder.response.ListApiResponse;
+import com.devdahcoder.response.data.ListApiResponseData;
 import com.devdahcoder.user.service.UserService;
 import com.devdahcoder.util.ApiUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +35,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("")
-    public ResponseEntity<ListApiResponse<UserMapperModel>> findAllUsers(
+    public ResponseEntity<ListApiResponseData<UserMapperModel>> findAllUsers(
             @RequestParam(defaultValue = "10", required = false, name = "limit") int limit,
             @RequestParam(defaultValue = "0", required = false, name = "offset") int offset,
             @RequestParam(defaultValue = "ASC", required = false, name = "order") String order,
@@ -45,35 +46,39 @@ public class UserController {
 
         int totalPage = ApiUtil.calculatePagination(userService.countUser(), limit);
 
-        ListApiResponse<UserMapperModel> listApiResponse = new ListApiResponse<>(page,
+        ListApiResponseData<UserMapperModel> listApiResponseData = new ListApiResponseData<>(page,
                 allUsers, limit, offset, userService.countUser(), totalPage, order, ApiUtil.hasNextPage(page, totalPage),
                 allUsers.size(), "All users", ApiUtil.hasPreviousPage(page));
 
-        return new ResponseEntity<>(listApiResponse, HttpStatus.OK);
+        return new ResponseEntity<>(listApiResponseData, HttpStatus.OK);
 
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create")
-    public ResponseEntity<CreateApiResponse<CreateUserModel>> createUser(@RequestBody @Valid CreateUserModel user) {
+    public ResponseEntity<CreateApiResponseSuccess<CreateUserModel>> createUser(@RequestBody @Valid CreateUserModel user) {
 
         CreateUserModel createdUser = userService.createUser(user);
 
-        CreateApiResponse<CreateUserModel> createApiResponse = new CreateApiResponse<>(
+        CreateApiResponseSuccess<CreateUserModel> createApiResponseSuccess = new CreateApiResponseSuccess<>(
                 HttpStatus.CREATED,
                 Map.of("user", createdUser),
                 Map.of("self", httpServletRequest.getServletPath())
         );
 
-        return new ResponseEntity<>(createApiResponse, HttpStatus.CREATED);
+        return new ResponseEntity<>(createApiResponseSuccess, HttpStatus.CREATED);
 
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateUser(@RequestBody @Valid AuthenticateUserModel authenticateUserModel) {
+    public ResponseEntity<JwtTokenApiResponseSuccess> authenticateUser(@RequestBody @Valid AuthenticateUserModel authenticateUserModel) {
 
-        return new ResponseEntity<>(userService.authenticateUser(authenticateUserModel), HttpStatus.ACCEPTED);
+        String generatedJwtToken = userService.authenticateUser(authenticateUserModel);
+
+        JwtTokenApiResponseSuccess jwtTokenApiResponseSuccess = new JwtTokenApiResponseSuccess(HttpStatus.OK.toString(), "JWT token generated successfully", generatedJwtToken);
+
+        return new ResponseEntity<>(jwtTokenApiResponseSuccess, HttpStatus.ACCEPTED);
 
     }
 

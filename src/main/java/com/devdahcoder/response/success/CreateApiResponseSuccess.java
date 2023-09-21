@@ -1,4 +1,4 @@
-package com.devdahcoder.response;
+package com.devdahcoder.response.success;
 
 import org.springframework.http.HttpStatus;
 
@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Represents the response structure for a creation (POST) request.
  */
-public class CreateApiResponse<T> {
+public class CreateApiResponseSuccess<T> {
 
     /**
      * The status of the response, typically an HTTP status code and message.
@@ -31,7 +31,7 @@ public class CreateApiResponse<T> {
      * @param data   The data returned in the response.
      * @param links  Links to related resources or actions.
      */
-    public CreateApiResponse(HttpStatus status, Map<String, T> data, Map<String, String> links) {
+    public CreateApiResponseSuccess(HttpStatus status, Map<String, T> data, Map<String, String> links) {
 
         this.status = status;
         this.data = data;

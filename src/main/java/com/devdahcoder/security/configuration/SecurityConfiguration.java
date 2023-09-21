@@ -2,6 +2,7 @@ package com.devdahcoder.security.configuration;
 
 import com.devdahcoder.security.filter.JwtAuthenticationFilter;
 import com.devdahcoder.security.provider.UserNamePasswordAuthenticationProvider;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -54,12 +55,14 @@ public class SecurityConfiguration {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-//                                .requestMatchers("api/v1/users/**")
-//                                .permitAll()
-                                .anyRequest()
+                                .requestMatchers("api/v1/users/create", "api/v1/users/login")
                                 .permitAll()
+                                .anyRequest()
+                                .authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
+                .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
+						.authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage())))
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())

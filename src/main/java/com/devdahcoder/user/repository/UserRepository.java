@@ -111,18 +111,16 @@ public class UserRepository implements UserServiceInterface, UserDetailsService 
     @Override
     public CreateUserModel createUser(@NotNull CreateUserModel user) {
 
-        String sqlQuery = "INSERT INTO todo.user(userId, firstName, lastName, email, username, password, gender, role) values(?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO todo.user(userId, firstName, lastName, email, username, password, role) values(?, ?, ?, ?, ?, ?, ?)";
 
         try {
 
             jdbcClient
                     .sql(sqlQuery)
-                    .params(List.of(user.getUserId().toString(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword(), user.getGender().toString(), user.getRole().toString()))
+                    .params(List.of(user.getUserId().toString(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword(), user.getRole().toString()))
                     .update();
 
             return user;
-
-//            return created == 1 ? "Created user: " + user.getUsername() : "Could not create user: " + user.getUsername();
 
         } catch (BadSqlGrammarException exception) {
 

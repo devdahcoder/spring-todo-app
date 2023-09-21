@@ -13,22 +13,25 @@ import java.util.UUID;
 public class CreateUserModel {
 
     private UUID userId;
+    @NotBlank( message = "Firstname cannot be blank" )
     @NotEmpty( message = "Firstname cannot be empty" )
     private String firstName;
+    @NotBlank( message = "Lastname cannot be blank" )
     @NotEmpty( message = "Lastname cannot be empty" )
     private String lastName;
     @Email( message = "Email must be a valid email" )
+    @NotBlank( message = "Email cannot be blank" )
     @NotEmpty( message = "Email cannot be empty" )
     private String email;
+    @NotBlank( message = "Username cannot be blank" )
     @NotEmpty( message = "Username cannot be empty" )
     private String username;
+    @NotBlank( message = "Password cannot be black" )
     @NotEmpty( message = "Password cannot be empty" )
     private String password;
-//    @NotEmpty( message = "Gender cannot be empty" )
-    private GenderEnum gender;
     private RoleEnum role;
 
-    public CreateUserModel(String firstName, String lastName, String email, String username, String password, GenderEnum gender, RoleEnum role) {
+    public CreateUserModel(String firstName, String lastName, String email, String username, String password, RoleEnum role) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -36,7 +39,6 @@ public class CreateUserModel {
         this.password = password;
         this.username = username;
         this.role = role;
-        this.gender = gender;
 
     }
 
@@ -122,18 +124,6 @@ public class CreateUserModel {
         this.role = role;
     }
 
-    public GenderEnum getGender() {
-
-        return gender;
-
-    }
-
-    public void setGender(GenderEnum gender) {
-
-        this.gender = gender;
-
-    }
-
     @Override
     public boolean equals(Object o) {
 
@@ -141,14 +131,14 @@ public class CreateUserModel {
 
         if (!(o instanceof CreateUserModel that)) return false;
 
-        return Objects.equals(getUserId(), that.getUserId()) && Objects.equals(getFirstName(), that.getFirstName()) && Objects.equals(getLastName(), that.getLastName()) && Objects.equals(getEmail(), that.getEmail()) && Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getPassword(), that.getPassword()) && getRole() == that.getRole() && getGender() == that.getGender();
+        return Objects.equals(getUserId(), that.getUserId()) && Objects.equals(getFirstName(), that.getFirstName()) && Objects.equals(getLastName(), that.getLastName()) && Objects.equals(getEmail(), that.getEmail()) && Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getPassword(), that.getPassword()) && getRole() == that.getRole();
 
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(getUserId(), getFirstName(), getLastName(), getEmail(), getUsername(), getPassword(), getRole(), getGender());
+        return Objects.hash(getUserId(), getFirstName(), getLastName(), getEmail(), getUsername(), getPassword(), getRole());
 
     }
 
@@ -163,9 +153,7 @@ public class CreateUserModel {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", role=" + role +
-                ", gender=" + gender +
                 '}';
-
     }
 
 }
