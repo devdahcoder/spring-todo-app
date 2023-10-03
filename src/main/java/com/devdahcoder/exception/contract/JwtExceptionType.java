@@ -2,6 +2,6 @@ package com.devdahcoder.exception.contract;
 
 public enum JwtExceptionType {
 
-    ExpiredJwtException, Exception
+    ExpiredJwtException, SignatureException, MalformedJwtException, UnsupportedJwtException, IllegalArgumentException, JwtException
 
 }

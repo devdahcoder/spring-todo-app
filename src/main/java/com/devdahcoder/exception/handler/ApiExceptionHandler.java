@@ -8,6 +8,9 @@ import com.devdahcoder.response.error.BadRequestFieldApiResponseError;
 import com.devdahcoder.exception.model.ApiExceptionModel;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -105,16 +108,31 @@ public class ApiExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(ApiJwtExpiredException.class)
-    public ResponseEntity<ApiAuthenticationExceptionModel> getExpiredJwtExceptionHandler(@NotNull ApiJwtExpiredException apiJwtExpiredException) {
-
-        logger.error("Jwt token has expired user should re-authenticate handler", apiJwtExpiredException);
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ApiAuthenticationExceptionModel> getExpiredJwtExceptionHandler(@NotNull ExpiredJwtException expiredJwtException) {
 
         ApiAuthenticationExceptionModel apiAuthenticationExceptionModel = new ApiAuthenticationExceptionModel(
                 HttpStatus.UNAUTHORIZED.value(),
                 HttpStatus.UNAUTHORIZED,
                 "Authentication failed",
-                apiJwtExpiredException.getMessage(),
+                expiredJwtException.getMessage(),
+                httpServletRequest.getRequestURL().toString(),
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+
+        return new ResponseEntity<>(apiAuthenticationExceptionModel, HttpStatus.UNAUTHORIZED);
+
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<ApiAuthenticationExceptionModel> getSignatureExceptionHandler(@NotNull SignatureException signatureException) {
+
+        ApiAuthenticationExceptionModel apiAuthenticationExceptionModel = new ApiAuthenticationExceptionModel(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED,
+                "Authentication failed",
+                signatureException.getMessage(),
                 httpServletRequest.getRequestURL().toString(),
                 ZonedDateTime.now(ZoneId.of("Z"))
         );
@@ -144,30 +162,24 @@ public class ApiExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> getServerExceptionHandler(@NotNull Exception exception) {
 
-        if (exception instanceof ExpiredJwtException) {
 
-            ApiAuthenticationExceptionModel apiAuthenticationExceptionModel = new ApiAuthenticationExceptionModel(
-                    HttpStatus.UNAUTHORIZED.value(),
-                    HttpStatus.UNAUTHORIZED,
-                    "Authentication failed",
+        ApiExceptionModel apiExceptionModel = null;
+
+        switch (this.getExceptionType(exception)) {
+
+            case ExpiredJwtException -> this.getExpiredJwtExceptionHandler((ExpiredJwtException) exception);
+
+            case SignatureException -> this.getSignatureExceptionHandler((SignatureException) exception);
+
+            default -> apiExceptionModel = new ApiExceptionModel(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     exception.getMessage(),
-                    httpServletRequest.getRequestURL().toString(),
+                    exception.getCause(),
+                    HttpStatus.INTERNAL_SERVER_ERROR,
                     ZonedDateTime.now(ZoneId.of("Z"))
             );
 
-            return new ResponseEntity<>(apiAuthenticationExceptionModel, HttpStatus.UNAUTHORIZED);
-
         }
-
-        logger.error("Something went wrong which is causing the application to fail: ", exception);
-
-        ApiExceptionModel apiExceptionModel = new ApiExceptionModel(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                exception.getMessage(),
-                exception.getCause(),
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                ZonedDateTime.now(ZoneId.of("Z"))
-        );
 
         return new ResponseEntity<>(apiExceptionModel, HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -179,9 +191,27 @@ public class ApiExceptionHandler {
 
             return JwtExceptionType.ExpiredJwtException;
 
-        }
+        } else if (exception instanceof SignatureException) {
 
-        return JwtExceptionType.Exception;
+            return JwtExceptionType.SignatureException;
+
+        } else if (exception instanceof MalformedJwtException) {
+
+            return JwtExceptionType.MalformedJwtException;
+
+        } else if (exception instanceof UnsupportedJwtException) {
+
+            return JwtExceptionType.UnsupportedJwtException;
+
+        } else if (exception instanceof IllegalArgumentException) {
+
+            return JwtExceptionType.IllegalArgumentException;
+
+        } else {
+
+            return JwtExceptionType.JwtException;
+
+        }
 
     }
 

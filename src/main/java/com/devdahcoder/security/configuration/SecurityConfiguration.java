@@ -2,7 +2,6 @@ package com.devdahcoder.security.configuration;
 
 import com.devdahcoder.exception.authentication.JwtAuthenticationEntryPoint;
 import com.devdahcoder.exception.handler.ApiExceptionHandler;
-import com.devdahcoder.exception.handler.AuthenticationExceptionHandler;
 import com.devdahcoder.security.filter.JwtAuthenticationFilter;
 import com.devdahcoder.security.provider.UserNamePasswordAuthenticationProvider;
 import org.jetbrains.annotations.NotNull;
@@ -27,18 +26,15 @@ public class SecurityConfiguration {
     private final UserNamePasswordAuthenticationProvider userNamePasswordAuthenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final AuthenticationExceptionHandler authenticationExceptionHandler;
     private final ApiExceptionHandler apiExceptionHandler;
 
-    public SecurityConfiguration(UserNamePasswordAuthenticationProvider userNamePasswordAuthenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, AuthenticationExceptionHandler authenticationExceptionHandler, ApiExceptionHandler apiExceptionHandler) {
+    public SecurityConfiguration(UserNamePasswordAuthenticationProvider userNamePasswordAuthenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, ApiExceptionHandler apiExceptionHandler) {
 
         this.userNamePasswordAuthenticationProvider = userNamePasswordAuthenticationProvider;
 
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-
-        this.authenticationExceptionHandler = authenticationExceptionHandler;
 
         this.apiExceptionHandler = apiExceptionHandler;
 
